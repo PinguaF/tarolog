@@ -21,7 +21,7 @@ markup_zodiak.add(*button_array)
 
 #ADMIN COMMAND LIST
 def send_admin_message(message, bot):
-    user = get_user_from_db(message.from_user.id)
+    user = User.get_user_from_db(message.from_user.id, message)
     if(user[0][6] == "admin"):
         markup = types.InlineKeyboardMarkup(row_width = 1)
         markup.add(types.InlineKeyboardButton(text="Ежедневная рассылка", callback_data="admin_everyday"))
@@ -34,8 +34,8 @@ def send_admin_message(message, bot):
 #TODAY GOROSKOP
 def send_today_goroskop(message, bot):
         bot.send_message(message.chat.id, config_lang["message_waiting1"])
-        user = get_user_from_db(message.from_user.id)[0]
-        answer = generate_goroskope(astrolog_type=user[4], zodiak=user[5])
+        user = User(message.from_user.id)
+        answer = generate_goroskope(astrolog_type=user.TypeAstrolog, zodiak=user.Zodiak)
         markup = types.InlineKeyboardMarkup(row_width = 1)
         markup.add(types.InlineKeyboardButton(text=config_lang["button_claim_card"], callback_data="goroskop"))
         bot.edit_message_text(message_id=message.id+1, chat_id =message.chat.id, text=config_lang["message_your_goroskop"]+answer, reply_markup = markup)
@@ -46,8 +46,9 @@ def send_profile(message, bot):
         with sqlite3.connect("main.db") as db:
             cursor = db.cursor()
             cursor.execute(f""" SELECT * FROM Users WHERE Id = {message.from_user.id}""")
-            user = cursor.fetchall()
+            #user = cursor.fetchall()
         db.close()
+        user = User(message.from_user.id)
         markup = types.InlineKeyboardMarkup(row_width = 1)
         markup.add(types.InlineKeyboardButton(text=config_lang["button_change_name"], callback_data="change_name"))
         markup.add(types.InlineKeyboardButton(text=config_lang["button_change_tarolog"], callback_data="change_tarolog"))
@@ -55,7 +56,8 @@ def send_profile(message, bot):
         markup.add(types.InlineKeyboardButton(text=config_lang["button_change_zodiak"], callback_data="change_zodiak"))
         #bot.delete_message(message_id=message.id, chat_id =message.chat.id)
         bot.send_message(message.chat.id, 
-                         f"Ваш профиль: \n Имя: {user[0][1]} \n Количество каточек: {user[0][2]} \n Знак зодиака: {config_lang[str(user[0][5])]} \n Персональный астролог: {config_lang["astrolog"+str(user[0][4])]}",
+                         f"Ваш профиль: \n Имя: {user.Username} \n Количество каточек: {user.CountCard} \n 
+                         Знак зодиака: {config_lang[str(user.Zodiak)]} \n Персональный астролог: {config_lang["astrolog"+str(user.TypeAstrolog)]}",
                          reply_markup = markup)
 
 

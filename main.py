@@ -4,7 +4,7 @@ import telebot
 from telebot import types
 from telebot.types import LabeledPrice
 
-from config.config import TOKEN, TOKEN_AI
+from config.config import TOKEN
 from db.db import *
 from commands.commands import *
 from callback.callback import *
