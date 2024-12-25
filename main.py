@@ -9,7 +9,7 @@ from db.db import *
 from commands.commands import *
 from callback.callback import *
 
-logging.basicConfig(level=logging.INFO, filename="py_log.log",filemode="w", format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO, filename="log.log", filemode="w", format="%(asctime)s %(levelname)s %(message)s")
 
 bot = telebot.TeleBot(TOKEN)
 
