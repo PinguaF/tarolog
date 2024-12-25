@@ -87,3 +87,15 @@ def callback_change_tarolog(call, bot):
         markup.add(types.InlineKeyboardButton(text=astrolog_list[1], callback_data="change_tarolog_1"))
         markup.add(types.InlineKeyboardButton(text=astrolog_list[2], callback_data="change_tarolog_2"))
         bot.edit_message_text(message_id=call.message.id, chat_id =call.message.chat.id, text=config_lang["message_choose_tarolog"], reply_markup = markup)
+
+def callback_change_sub(call, bot):
+    with sqlite3.connect("main.db") as db:
+            cursor = db.cursor()
+            cursor.execute(f"""SELECT Subscription FROM Users WHERE Id = {call.from_user.id}""")
+            is_sub = cursor.fetchall()[0][0]
+            if(is_sub==0):
+                cursor.execute(f"""UPDATE Users SET Subscription = '{1}' WHERE Id = {call.from_user.id}""")
+                bot.answer_callback_query(call.id, config_lang["alert_now_you_sub"])
+            else:
+                cursor.execute(f"""UPDATE Users SET Subscription = {0} WHERE Id = {call.from_user.id}""")
+                bot.answer_callback_query(call.id, config_lang["alert_now_you_dont_sub"])

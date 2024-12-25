@@ -9,11 +9,15 @@ from db.db import *
 from commands.commands import *
 from callback.callback import *
 
+
+with io.open('config/lang-ru-0.json', encoding='utf-8') as file:
+    config_lang = json.load(file)
+
 logging.basicConfig(level=logging.INFO, filename="log.log", filemode="w", format="%(asctime)s %(levelname)s %(message)s")
 
 bot = telebot.TeleBot(TOKEN)
 
-commands_list = ["Настройки профиля", "Гороскоп на сегодня", "", ""]
+commands_list = [config_lang["button_gadanie"], config_lang["button_profile_settings"], config_lang["button_today_goroskop"], ""]
 zodiak_list = ["Овен", "Телец", "Близнецы", "Рак", "Лев", "Дева", "Весы", "Скорпион", "Стрелец", "Козерог", "Водолей", "Рыбы"]
 markup_zodiak = types.InlineKeyboardMarkup(row_width = 3)
 button_array = []
@@ -48,19 +52,28 @@ def start_message(message):
 def admin_message(message):
     send_admin_message(message, bot)
 
-@bot.message_handler(func=lambda message : message.text =="Гороскоп на сегодня")
+#today goroskope
+@bot.message_handler(func=lambda message : message.text == config_lang["button_today_goroskop"])
 def goroskop_message(message):
     send_today_goroskop(message, bot)
 
-@bot.message_handler(func=lambda message : message.text =="Настройки профиля")
+#profile settings
+@bot.message_handler(func=lambda message : message.text == config_lang["button_profile_settings"])
 def profile_generate(message):
         send_profile(message, bot)
 
 
-#@bot.message_handler(content_types=['text'])
-#def ai_generate(message):
-#  if (not message.text in commands_list) and (message.chat.id > 0):
-#    bot.send_message(message.chat.id, "Ожидайте ответ свыше...")
+#gadanie step 1
+@bot.message_handler(func=lambda message : message.text == config_lang["button_gadanie"])
+def profile_generate(message):
+        send_gadanie(message, bot)
+        
+
+#to gadanie
+@bot.message_handler(content_types=['text'])
+def ai_generate(message):
+  if (not message.text in commands_list) and (message.chat.id > 0):
+    bot.send_message(message.chat.id, "Ожидайте ответ свыше...")
 
 #in callback factory
 @bot.callback_query_handler(func=lambda call: True)
@@ -83,6 +96,9 @@ def callback_query(call):
     
     if str(call.data).startswith("change_name"):
         callback_change_name(call, bot)
+
+    if str(call.data).startswith("change_sub"):
+        callback_change_sub(call, bot)
 
 
 
